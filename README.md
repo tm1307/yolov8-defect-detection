@@ -325,4 +325,3 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ---
 
-*Built as a demonstration of ML engineering skills for the Amazon ML Summer School 2026 application.*
