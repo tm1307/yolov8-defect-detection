@@ -97,7 +97,7 @@ def validate_environment() -> dict[str, str]:
 
     if torch.cuda.is_available():
         env_info["device_name"] = torch.cuda.get_device_name(0)
-        gpu_mem_bytes = torch.cuda.get_device_properties(0).total_mem
+        gpu_mem_bytes = torch.cuda.get_device_properties(0).total_memory
         env_info["gpu_memory_gb"] = f"{gpu_mem_bytes / (1024**3):.1f}"
 
     print("[train] Environment:")
