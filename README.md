@@ -270,7 +270,10 @@ Opens a Gradio interface at `http://localhost:7860` with:
 
 ### Demo
 
-<video src="assets/demo.mov" width="800" controls autoplay loop></video>
+<!-- Replace with your actual demo GIF -->
+![Demo GIF](assets/demo.gif)
+
+*Record your demo GIF by screen-recording the Gradio interface, then replace the placeholder above.*
 
 ---
 

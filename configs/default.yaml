@@ -1,35 +1,41 @@
+# Configuration for YOLOv8 Defect Detection Pipeline
+# Adjust these values based on your hardware and dataset
 
+# --- Data ---
 data:
-  coco_root: "./datasets/coco"
-  subset_categories:
+  coco_root: "./datasets/coco"           # Path to COCO dataset root
+  subset_categories:                       # COCO categories to use as "defect proxies"
     - "bottle"
     - "cup"
     - "bowl"
     - "knife"
     - "scissors"
-  max_train_images: 2000
-  max_val_images: 500
-  val_split: 0.2
+  max_train_images: 2000                   # Cap training images for Colab feasibility
+  max_val_images: 500                      # Cap validation images
+  val_split: 0.2                           # Validation split ratio if not using COCO val
   seed: 42
 
+# --- Model ---
 model:
-  architecture: "yolov8n.pt"
-  input_size: 640
-  num_classes: 5
+  architecture: "yolov8n.pt"               # Nano variant for Colab T4 (fastest)
+  input_size: 640                          # Standard YOLO input resolution
+  num_classes: 5                           # Must match len(subset_categories)
 
+# --- Training ---
 training:
   epochs: 50
-  batch_size: 16
+  batch_size: 16                           # Safe for T4 16GB VRAM with yolov8n
   learning_rate: 0.01
   optimizer: "SGD"
   momentum: 0.937
   weight_decay: 0.0005
   warmup_epochs: 3
-  patience: 10
-  save_period: 10
-  workers: 2
-  device: "0"
+  patience: 10                             # Early stopping patience
+  save_period: 10                          # Checkpoint save interval (epochs)
+  workers: 2                               # DataLoader workers (Colab has limited CPU)
+  device: "0"                              # GPU device; use "cpu" for CPU-only
 
+# --- Augmentation ---
 augmentation:
   horizontal_flip_prob: 0.5
   vertical_flip_prob: 0.0
@@ -39,23 +45,27 @@ augmentation:
   blur_limit: 3
   noise_var_limit: 25.0
 
+# --- Evaluation ---
 evaluation:
   confidence_threshold: 0.25
   iou_threshold: 0.45
   max_detections: 300
 
+# --- Logging ---
 logging:
   wandb_project: "yolov8-defect-detection"
-  wandb_entity: null
+  wandb_entity: null                       # Set to your W&B username/team
   log_images: true
-  log_interval: 10
+  log_interval: 10                         # Log every N batches
 
+# --- Inference ---
 inference:
   confidence_threshold: 0.5
   iou_threshold: 0.45
   max_detections: 100
   output_dir: "./outputs/inference"
 
+# --- Paths ---
 paths:
   output_dir: "./outputs"
   checkpoints_dir: "./outputs/checkpoints"
