@@ -193,28 +193,31 @@ python -m src.evaluate \
     --config configs/default.yaml
 ```
 
-### Expected Results (YOLOv8n, 50 epochs, ~2000 train images)
+### Actual Evaluation Results (YOLOv8n, 11 epochs, ~2000 train images)
 
-> **⚠️ Important:** The metrics below are **conservative estimates** based on published YOLOv8n benchmarks on COCO subsets of similar size. Your actual results will vary depending on the exact subset sampled, augmentation randomness, and hardware. **Run the evaluation yourself to get ground-truth numbers.**
+> **Note:** Training converged and stopped early at 11 epochs due to early stopping patience (no improvement).
 
-| Metric | Estimated Range |
-|--------|----------------|
-| mAP@50 | 0.55 – 0.70 |
-| mAP@50:95 | 0.35 – 0.50 |
-| Mean Precision | 0.60 – 0.75 |
-| Mean Recall | 0.50 – 0.65 |
-| Mean F1 | 0.55 – 0.68 |
+| Metric | Value |
+|--------|-------|
+| mAP@50 | 0.3157 |
+| mAP@50:95 | 0.2584 |
+| Mean Precision | 0.5319 |
+| Mean Recall | 0.1000 |
+| Mean F1 | 0.1684 |
 
-**Why these ranges?**
-- YOLOv8n achieves ~37.3 mAP@50:95 on the *full* 80-class COCO val set (Ultralytics benchmark)
-- With only 5 classes and COCO-pretrained weights, per-class performance is typically *higher* than the 80-class average
-- However, we're using only ~2000 training images (vs. 118K full COCO), which limits performance
-- Augmentation partially compensates but cannot match full dataset performance
+### Per-Class Results
+
+| Class | AP@50 | Precision | Recall | F1 |
+|-------|-------|-----------|--------|-----|
+| bottle | 0.4388 | 0.6667 | 0.1930 | 0.2994 |
+| cup | 0.4312 | 0.7595 | 0.1190 | 0.2058 |
+| bowl | 0.5407 | 0.9000 | 0.1827 | 0.3038 |
+| knife | 0.1676 | 0.3333 | 0.0054 | 0.0106 |
+| scissors | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
 
 ### Per-Class Notes
-
-- **bottle, cup, bowl** — typically higher AP because they are common, well-represented COCO categories
-- **knife, scissors** — typically lower AP due to smaller size, less training data, and higher intra-class variation
+- **bottle, cup, bowl** — These objects are well-represented in the COCO subset, achieving reasonable precision.
+- **knife, scissors** — These classes performed poorly (0.0 mAP for scissors) due to very low instance counts (e.g., only 19 scissors instances in the validation set) and their high intra-class variation. More targeted training data would be needed for these specific defects.
 
 ### Outputs
 
