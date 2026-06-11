@@ -323,5 +323,4 @@ Opens a Gradio interface at `http://localhost:7860` with:
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
----
 

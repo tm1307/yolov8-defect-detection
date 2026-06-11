@@ -256,8 +256,7 @@ def build_gradio_app() -> gr.Blocks:
             **Model:** YOLOv8n (nano) · **Dataset:** COCO 2017 subset
             · **Classes:** bottle, cup, bowl, knife, scissors
 
-            *Built as a demonstration project for ML engineering portfolio.
-            See [GitHub repo](https://github.com/tm1307/yolov8-defect-detection)
+            *See [GitHub repo](https://github.com/tm1307/yolov8-defect-detection)
             for training details and full pipeline.*
             """
         )
