@@ -1,5 +1,3 @@
-# Expected runtime: N/A (module file)
-# Tested on: Colab T4 / local CPU
 """
 Source package for YOLOv8 Defect Detection pipeline.
 

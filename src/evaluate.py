@@ -1,5 +1,3 @@
-# Expected runtime: 2-5 min (validation on 500 images, Colab T4)
-# Tested on: Colab T4 / local CPU
 """
 evaluate.py — Model evaluation with mAP@50, F1 score, and confusion matrix.
 
@@ -102,8 +100,6 @@ def extract_metrics(results: Any, class_names: list[str]) -> dict[str, Any]:
         These are micro-averaged metrics from the best confidence threshold
         chosen by Ultralytics' internal optimization.
     """
-    # Access the metrics box object
-    # Ultralytics stores per-class metrics in results.box
     box = results.box
 
     metrics: dict[str, Any] = {
@@ -117,8 +113,6 @@ def extract_metrics(results: Any, class_names: list[str]) -> dict[str, Any]:
         "per_class": {},
     }
 
-    # Per-class metrics
-    # box.ap50() returns per-class AP@50 as a numpy array
     ap50_per_class = box.ap50
     precision_per_class = box.p  # Per-class precision at best threshold
     recall_per_class = box.r  # Per-class recall at best threshold
@@ -177,17 +171,13 @@ def plot_confusion_matrix(
         as the last row/column. We include it in the plot for completeness,
         as it shows false positive and false negative rates.
     """
-    # Ultralytics stores the confusion matrix in results.confusion_matrix
     cm = results.confusion_matrix
-    # The .matrix attribute gives the raw numpy array
     matrix = cm.matrix
 
     display_names = class_names + ["background"]
 
     if normalize:
-        # Normalize by row (true class) to get percentages
         row_sums = matrix.sum(axis=1, keepdims=True)
-        # Avoid division by zero
         row_sums = np.where(row_sums == 0, 1, row_sums)
         matrix = matrix / row_sums
 
@@ -299,14 +289,11 @@ def evaluate(
     print(f"[evaluate] Dataset: {dataset_yaml}")
     print(f"[evaluate] Classes: {class_names}")
 
-    # --- Run validation ---
     print("\n[evaluate] Running validation...")
     results = run_validation(model_path, dataset_yaml, config)
 
-    # --- Extract metrics ---
     metrics = extract_metrics(results, class_names)
 
-    # --- Print results table ---
     table = format_results_table(metrics)
     print(f"\n{'='*60}")
     print("EVALUATION RESULTS")
@@ -314,7 +301,6 @@ def evaluate(
     print(table)
     print(f"{'='*60}\n")
 
-    # --- Save confusion matrix ---
     figures_dir = config["paths"]["figures_dir"]
     cm_path = plot_confusion_matrix(
         results,
@@ -322,13 +308,11 @@ def evaluate(
         output_path=str(Path(figures_dir) / "confusion_matrix.png"),
     )
 
-    # --- Save metrics JSON ---
     metrics_json_path = save_metrics_json(
         metrics,
         output_path=str(Path(figures_dir) / "evaluation_metrics.json"),
     )
 
-    # --- Save markdown table ---
     table_path = Path(figures_dir) / "results_table.md"
     with open(table_path, "w") as f:
         f.write(table)
@@ -337,9 +321,6 @@ def evaluate(
     return metrics
 
 
-# ---------------------------------------------------------------------------
-# CLI entry point
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import argparse
 

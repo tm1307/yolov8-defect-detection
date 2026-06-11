@@ -1,5 +1,3 @@
-# Expected runtime: N/A (web server — runs until stopped)
-# Tested on: Colab T4 / local CPU (Gradio launches on port 7860)
 """
 app.py — Gradio web demo for interactive defect detection.
 
@@ -15,7 +13,6 @@ for all predictions, keeping latency low.
 Usage:
     python -m src.app --model outputs/train_run/weights/best.pt
 
-    # On Colab, add share=True to get a public URL:
     python -m src.app --model outputs/train_run/weights/best.pt --share
 """
 
@@ -38,9 +35,6 @@ from src.inference import (
 )
 
 
-# ---------------------------------------------------------------------------
-# Global state (set at startup)
-# ---------------------------------------------------------------------------
 MODEL: YOLO | None = None
 MODEL_PATH: str = ""
 
@@ -99,11 +93,8 @@ def predict_and_annotate(
     if MODEL is None:
         return None, "❌ Model not loaded. Check server logs."
 
-    # Gradio provides RGB, YOLO expects BGR for OpenCV operations
     image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-    # Save temporarily for YOLO predict (it needs a file path or numpy array)
-    # Using numpy array directly via model.predict(source=image_bgr)
     results = MODEL.predict(
         source=image_bgr,
         conf=confidence_threshold,
@@ -112,7 +103,6 @@ def predict_and_annotate(
         verbose=False,
     )
 
-    # Parse detections
     detections: list[Detection] = []
     if len(results) > 0 and results[0].boxes is not None:
         boxes = results[0].boxes
@@ -131,11 +121,9 @@ def predict_and_annotate(
                 bbox_xywh=xywh,
             ))
 
-    # Draw detections
     annotated_bgr = draw_detections(image_bgr, detections)
     annotated_rgb = cv2.cvtColor(annotated_bgr, cv2.COLOR_BGR2RGB)
 
-    # Format summary
     if len(detections) == 0:
         summary = "No defects detected in this image."
     else:
@@ -150,7 +138,6 @@ def predict_and_annotate(
                 f"| {idx} | {det.class_name} | {det.confidence:.3f} | ({bbox_str}) |"
             )
 
-        # Class distribution
         class_counts: dict[str, int] = {}
         for det in detections:
             class_counts[det.class_name] = class_counts.get(det.class_name, 0) + 1
@@ -169,7 +156,6 @@ def build_gradio_app() -> gr.Blocks:
     Returns:
         A Gradio Blocks application ready to launch.
     """
-    # Custom CSS for a cleaner look
     custom_css = """
     .gradio-container {
         max-width: 1200px !important;
@@ -184,8 +170,6 @@ def build_gradio_app() -> gr.Blocks:
     ) as app:
         gr.Markdown(
             """
-            # 🔬 Real-Time Product Defect Detection
-            ### Powered by YOLOv8 · Fine-tuned on COCO subset
 
             Upload a product image to detect defects. Adjust the sliders to
             control detection sensitivity.
@@ -236,14 +220,12 @@ def build_gradio_app() -> gr.Blocks:
                     value="Upload an image and click 'Detect Defects' to begin.",
                 )
 
-        # Wire up the detection button
         detect_button.click(
             fn=predict_and_annotate,
             inputs=[input_image, conf_slider, iou_slider],
             outputs=[output_image, detection_summary],
         )
 
-        # Also trigger on image upload for convenience
         input_image.change(
             fn=predict_and_annotate,
             inputs=[input_image, conf_slider, iou_slider],
@@ -264,9 +246,6 @@ def build_gradio_app() -> gr.Blocks:
     return app
 
 
-# ---------------------------------------------------------------------------
-# CLI entry point
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import argparse
 
@@ -292,10 +271,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    # Load model
     load_model_for_app(args.model)
 
-    # Build and launch app
     app = build_gradio_app()
     app.launch(
         server_name="0.0.0.0",

@@ -1,5 +1,3 @@
-# Expected runtime: ~0.1s per image (T4 GPU), ~1s per image (CPU)
-# Tested on: Colab T4 / local CPU
 """
 inference.py — Single-image and batch inference for defect detection.
 
@@ -29,9 +27,6 @@ import yaml
 from ultralytics import YOLO
 
 
-# ---------------------------------------------------------------------------
-# Data structures
-# ---------------------------------------------------------------------------
 @dataclass
 class Detection:
     """A single detected object with its bounding box and metadata.
@@ -72,10 +67,6 @@ class InferenceResult:
     inference_time_ms: float
 
 
-# ---------------------------------------------------------------------------
-# Color palette for visualization
-# ---------------------------------------------------------------------------
-# Distinct colors for up to 10 classes (BGR format for OpenCV)
 CLASS_COLORS: list[tuple[int, int, int]] = [
     (255, 85, 85),    # Red
     (85, 255, 85),    # Green
@@ -89,7 +80,6 @@ CLASS_COLORS: list[tuple[int, int, int]] = [
     (255, 85, 170),   # Pink
 ]
 
-# Visualization constants
 BBOX_THICKNESS = 2
 FONT_SCALE = 0.6
 FONT_THICKNESS = 2
@@ -155,14 +145,12 @@ def predict_single(
     if not Path(image_path).exists():
         raise FileNotFoundError(f"Image not found: {image_path}")
 
-    # Read image to get dimensions
     image = cv2.imread(image_path)
     if image is None:
         raise ValueError(f"Failed to read image: {image_path}")
 
     img_height, img_width = image.shape[:2]
 
-    # Run inference
     start_time = time.perf_counter()
     results = model.predict(
         source=image_path,
@@ -173,7 +161,6 @@ def predict_single(
     )
     elapsed_ms = (time.perf_counter() - start_time) * 1000
 
-    # Parse results
     detections: list[Detection] = []
     if len(results) > 0 and results[0].boxes is not None:
         boxes = results[0].boxes
@@ -256,7 +243,6 @@ def predict_batch(
         )
         results.append(result)
 
-    # Summary statistics
     total_detections = sum(r.num_detections for r in results)
     avg_time = np.mean([r.inference_time_ms for r in results])
     print(f"[inference] Batch complete: {len(results)} images, "
@@ -285,14 +271,11 @@ def draw_detections(
         x1, y1, x2, y2 = [int(c) for c in det.bbox_xyxy]
         color = CLASS_COLORS[det.class_id % len(CLASS_COLORS)]
 
-        # Draw bounding box
         cv2.rectangle(annotated, (x1, y1), (x2, y2), color, BBOX_THICKNESS)
 
-        # Prepare label text
         label = f"{det.class_name} {det.confidence:.2f}"
         label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, FONT_SCALE, FONT_THICKNESS)[0]
 
-        # Draw label background
         label_y1 = max(y1 - label_size[1] - 2 * LABEL_PADDING, 0)
         label_y2 = y1
         cv2.rectangle(
@@ -303,7 +286,6 @@ def draw_detections(
             -1,  # Filled rectangle
         )
 
-        # Draw label text
         cv2.putText(
             annotated,
             label,
@@ -397,7 +379,6 @@ def run_inference(
     input_path_obj = Path(input_path)
 
     if input_path_obj.is_file():
-        # Single image
         result = predict_single(
             model=model,
             image_path=str(input_path_obj),
@@ -409,7 +390,6 @@ def run_inference(
         print(f"[inference] {result.num_detections} detections in {result.inference_time_ms:.1f}ms")
 
     elif input_path_obj.is_dir():
-        # Batch inference
         all_results = predict_batch(
             model=model,
             image_dir=str(input_path_obj),
@@ -421,7 +401,6 @@ def run_inference(
     else:
         raise FileNotFoundError(f"Input path not found: {input_path}")
 
-    # --- Save outputs ---
     output_dir = Path(inf_cfg["output_dir"])
 
     if save_annotated:
@@ -437,9 +416,6 @@ def run_inference(
     return all_results
 
 
-# ---------------------------------------------------------------------------
-# CLI entry point
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import argparse
 

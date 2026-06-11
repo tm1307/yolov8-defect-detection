@@ -1,5 +1,3 @@
-# Expected runtime: 30-60 min (50 epochs on Colab T4 with yolov8n, 2000 images)
-# Tested on: Colab T4 / local CPU (CPU will be ~10x slower)
 """
 train.py — YOLOv8 fine-tuning with Weights & Biases experiment tracking.
 
@@ -25,7 +23,6 @@ import torch
 import yaml
 from ultralytics import YOLO
 
-# Optional: wandb may not be installed in all environments
 try:
     import wandb
     WANDB_AVAILABLE = True
@@ -142,13 +139,10 @@ def build_training_args(config: dict[str, Any], dataset_yaml: str) -> dict[str, 
         "project": paths_cfg["output_dir"],
         "name": "train_run",
         "exist_ok": True,
-        # Reproducibility
         "seed": config["data"]["seed"],
         "deterministic": True,
-        # Performance
         "amp": True,  # Mixed precision — essential for T4
         "cache": False,  # Don't cache images in RAM (Colab has limited RAM)
-        # Logging
         "verbose": True,
         "plots": True,
     }
@@ -182,14 +176,11 @@ def train(
     Returns:
         Path to the best model weights file.
     """
-    # --- Load config ---
     config = load_config(config_path)
     print(f"[train] Loaded config from: {config_path}")
 
-    # --- Validate environment ---
     env_info = validate_environment()
 
-    # --- Resolve dataset path ---
     if dataset_yaml is None:
         dataset_yaml = str(
             Path(config["data"]["coco_root"]).parent / "yolo_defect" / "dataset.yaml"
@@ -201,12 +192,10 @@ def train(
         )
     print(f"[train] Dataset config: {dataset_yaml}")
 
-    # --- Initialize W&B ---
     wandb_run = setup_wandb(config)
     if wandb_run is not None:
         wandb_run.log({"environment": env_info})
 
-    # --- Load model ---
     model_architecture = config["model"]["architecture"]
     if resume and resume_weights:
         print(f"[train] Resuming from: {resume_weights}")
@@ -215,17 +204,14 @@ def train(
         print(f"[train] Loading pretrained: {model_architecture}")
         model = YOLO(model_architecture)
 
-    # --- Build training arguments ---
     training_args = build_training_args(config, dataset_yaml)
     print("[train] Training arguments:")
     for key, value in sorted(training_args.items()):
         print(f"  {key}: {value}")
 
-    # --- Train ---
     print("\n[train] Starting training...")
     results = model.train(**training_args)
 
-    # --- Extract results ---
     output_dir = Path(training_args["project"]) / training_args["name"]
     best_weights = output_dir / "weights" / "best.pt"
     last_weights = output_dir / "weights" / "last.pt"
@@ -234,18 +220,12 @@ def train(
     print(f"  Best weights: {best_weights}")
     print(f"  Last weights: {last_weights}")
 
-    # --- Log final metrics to W&B ---
-    # Ultralytics automatically handles finishing the W&B run and logging the
-    # model artifacts if W&B is enabled.
     if wandb_run is not None:
         print("[train] W&B run finished by Ultralytics.")
 
     return best_weights
 
 
-# ---------------------------------------------------------------------------
-# CLI entry point
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import argparse
 
