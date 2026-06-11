@@ -235,19 +235,10 @@ def train(
     print(f"  Last weights: {last_weights}")
 
     # --- Log final metrics to W&B ---
+    # Ultralytics automatically handles finishing the W&B run and logging the
+    # model artifacts if W&B is enabled.
     if wandb_run is not None:
-        # Log the best model as a W&B artifact for versioning
-        model_artifact = wandb.Artifact(
-            name="yolov8n-defect-best",
-            type="model",
-            description="Best YOLOv8n checkpoint for defect detection",
-        )
-        if best_weights.exists():
-            model_artifact.add_file(str(best_weights))
-            wandb_run.log_artifact(model_artifact)
-
-        wandb_run.finish()
-        print("[train] W&B run finished and artifacts logged.")
+        print("[train] W&B run finished by Ultralytics.")
 
     return best_weights
 
