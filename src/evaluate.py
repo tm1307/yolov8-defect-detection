@@ -1,16 +1,4 @@
-"""
-evaluate.py — Model evaluation with mAP@50, F1 score, and confusion matrix.
 
-This module provides:
-1. Standard COCO-style mAP evaluation via Ultralytics' built-in validator
-2. Per-class precision, recall, and F1 computation
-3. Confusion matrix visualization and export
-4. A formatted results summary table for the README
-
-The evaluation uses Ultralytics' internal metrics engine, which implements
-the same mAP calculation as the official COCO evaluation toolkit. We extract
-and reformat those metrics for our use case.
-"""
 
 from __future__ import annotations
 

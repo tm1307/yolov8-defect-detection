@@ -1,20 +1,4 @@
-"""
-app.py — Gradio web demo for interactive defect detection.
 
-This module creates a browser-based UI where users can:
-1. Upload an image or use a webcam snapshot
-2. Adjust confidence and IoU thresholds via sliders
-3. See real-time detection results with annotated bounding boxes
-4. View a structured table of all detections
-
-The app loads the trained YOLOv8 model once at startup and reuses it
-for all predictions, keeping latency low.
-
-Usage:
-    python -m src.app --model outputs/train_run/weights/best.pt
-
-    python -m src.app --model outputs/train_run/weights/best.pt --share
-"""
 
 from __future__ import annotations
 

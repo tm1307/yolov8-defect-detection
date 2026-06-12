@@ -1,16 +1,3 @@
-"""
-inference.py — Single-image and batch inference for defect detection.
-
-This module provides production-ready inference utilities:
-1. Single image prediction with annotated output
-2. Batch inference over a directory of images
-3. Results serialization to JSON for downstream processing
-4. Visualization with bounding boxes, labels, and confidence scores
-
-All functions use the Ultralytics YOLO predict API and return structured
-results rather than raw tensors, making them easy to integrate with
-web apps and REST APIs.
-"""
 
 from __future__ import annotations
 

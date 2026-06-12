@@ -1,16 +1,3 @@
-"""
-train.py — YOLOv8 fine-tuning with Weights & Biases experiment tracking.
-
-This module wraps Ultralytics' training API with:
-1. Proper configuration management (YAML-driven, no magic numbers)
-2. W&B integration for experiment tracking, hyperparameter logging, and
-   artifact versioning
-3. Reproducibility controls (seed, deterministic mode)
-4. Colab-friendly defaults (batch size, workers, mixed precision)
-
-Usage:
-    python -m src.train --config configs/default.yaml --dataset datasets/yolo_defect/dataset.yaml
-"""
 
 from __future__ import annotations
 

@@ -1,17 +1,4 @@
-"""
-data_loader.py — COCO subset loading, filtering, and augmentation pipeline.
 
-This module handles:
-1. Downloading a subset of COCO 2017 (train + val splits)
-2. Filtering to keep only specified object categories
-3. Converting COCO annotations to YOLO format (normalized xywh)
-4. Applying Albumentations augmentations with bbox-safe transforms
-5. Creating the directory structure expected by Ultralytics YOLOv8
-
-Design decision: We use COCO categories as *proxies* for product defect types.
-In a production system you would replace this with a real defect dataset (e.g.,
-MVTec AD), but COCO gives us a free, well-annotated benchmark that runs on Colab.
-"""
 
 from __future__ import annotations
 
